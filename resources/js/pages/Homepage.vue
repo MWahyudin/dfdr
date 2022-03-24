@@ -325,7 +325,7 @@ export default {
       loading: false,
       slide: 0,
       sliding: null,
-      install: false,
+      install: true,
       form: {
         search_key: "",
       },
@@ -371,7 +371,7 @@ export default {
         this.install = res.data.data.file;
 
         if (!this.install) {
-          window.location.href = '/install';
+          // window.location.href = '/install';
           // this.$router.push("/install");
         }
       });

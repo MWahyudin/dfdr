@@ -2,35 +2,38 @@
 
 namespace App\Http\Controllers\Api;
 
-use Excel;
-use DateTime;
-use DateInterval;
-use DatePeriod;
 use PDF;
-use App\Http\Controllers\Controller;
 
-use App\Traits\ApiResponser;
+use DateTime;
+use DatePeriod;
+use DateInterval;
+use App\Models\User;
 
+use App\Models\Year;
+
+use App\Models\Report;
+use App\Models\Faculty;
+use App\Models\Version;
 use App\Models\Category;
 use App\Models\Language;
-use App\Models\Faculty;
-use App\Models\Year;
-use App\Models\Version;
-use App\Models\UploadForm;
-use App\Models\UploadFormCreator;
-use App\Models\UploadFormDivision;
-use App\Models\UploadFormType;
-use App\Models\UploadFormSubject;
-use App\Models\User;
 use App\Models\Department;
-
-use App\Exports\DepositExport;
-
-use Illuminate\Support\Facades\DB;
+use App\Models\JsonReport;
+use App\Models\UploadForm;
+use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
+use App\Exports\DepositExport;
+use App\Models\UploadFormType;
 
-use Auth;
+use App\Models\UploadFormCreator;
+use App\Models\UploadFormSubject;
+use App\Models\UploadFormDivision;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Imports\UploadFormImport;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class ReportController extends Controller
 {
@@ -653,7 +656,12 @@ class ReportController extends Controller
         $key->language_name = $language_name->language_name;
 
         $key->status = ucfirst($key->status);
-        $key->division_name = $key->uploadFormDivision[0]->division;
+
+        $key->date = date('d-m-Y', strtotime($key->date));
+        $key->relation = $key->relation;
+        $key->right_management = $key->right_management;
+        
+        // $key->division_name = $key->uploadFormDivision[0]->division;
 
         $i = 0;
         $str_type = "";
@@ -675,6 +683,7 @@ class ReportController extends Controller
             ]
           ]);
         }
+        $key->creator = $str_creator[0];
 
         $str_department = Department::find($key->users->department);
 
@@ -682,14 +691,42 @@ class ReportController extends Controller
         foreach ($key->uploadFormSubject as $ft) {
           array_push($str_subject, $ft->subject);
         }
+        $key->subject = $str_subject[0];
+        $key->type = $key->uploadFormType[0]->type;
+        $key->format = $key->uploadFormFormat[0]->format;
+        // <td>Contributor test</td>
+        // <td>Identifier test</td>
+        // <td>Source test</td>
+        // <td>Coverage test</td>
+        // <td>Division Information test</td>
+        $key->contributor = $key->uploadFormContributor[0]->contributor;
+        $key->identifier = $key->uploadFormIdentifier[0]->identifier;
+        $key->source = $key->uploadFormSource[0]->source;
+        $key->coverage = $key->uploadFormCoverage[0]->coverage;
+        $key->division = $key->uploadFormDivision[0]->division;
+        $key->file = $key->file;
 
+
+
+       
         // ---- insert JSON data
+        
+     
+        // $key->publisher = $str_creator[0];
+       
+        
         $x = [
+          'id' => $key->id,
+          'title' => $key->title,
+          'category' => $key->getCategoryById($key->category),
+          'description' => strip_tags($key->description),
+          'publisher' => $key->publisher,
           'datestamp' => $key->created_at,
           'monograph_type' => $key->category_name,
           'lastmod' => $key->updated_at,
-          'title' => $key->title,
+          // 'year' => $year[0],
           'date' => $key->date,
+          // 'creator' => $key->creator,
           'institution' => $key->publisher,
           'ispublished' => ($key->status == "Approved") ? "Published" : $key->status,
           'type' => $str_type,
@@ -703,7 +740,6 @@ class ReportController extends Controller
           'department' => $str_department->department_name,
           'dir' => '',
           'userid' => $key->user_id,
-          'publisher' => $key->publisher,
           'creators' => $str_creator_ex,
           'digirepo_id' => $key->id,
           'digirepo_status' => ($key->status == "Approved") ? "Published" : $key->status,
@@ -714,9 +750,14 @@ class ReportController extends Controller
           'rev_number' => null,
           'status_changed' => $key->updated_at,
         ];
+        
 
         array_push($json_data, $x);
       }
+       // CSV / Excel
+      //  $year = explode("-", $key->date);
+      //  $key->year = $year[0];
+      //  $key->languange = $key->language;
       
       $data = [
         'upload_form' => $uploadForm
@@ -728,7 +769,7 @@ class ReportController extends Controller
         $nama_file = 'Report_Deposit.xlsx';
         File::delete('downloads/release/'.$nama_file);
         $userexcel = Excel::store(new DepositExport($data), 'downloads/release/'.$nama_file, 'real_public');
-
+        // dd($data);
         return [
           'status' => "success",
           "data" => $nama_file,
@@ -736,8 +777,18 @@ class ReportController extends Controller
       }
       else if ($request->mode == 'generate_JSON')
       {
+        $save_report = Report::create([
+          'name' => $request->report_name == null ? date('Y-m-d') : $request->report_name,
+          'data' => json_encode($json_data),
+          'type' => 'json',
+          'status' => 'success',
+          'date' => date('Y-m-d H:i:s'),
+        
+        ]);
         return [
           'status' => "success",
+          'success_save' => $save_report ? true : false,
+          'id' => $save_report->id,
           // "data" => json_encode($uploadForm),
           "data" => json_encode($json_data),
         ];
@@ -755,4 +806,36 @@ class ReportController extends Controller
       }
       
     }
-}
+
+    public function getPdfReportDeposit($id)
+    {
+    
+      $json = Report::find($id)->data;
+      return response()->json([
+        'status' => 'success',
+        'data' => json_decode($json),
+      ]);
+      # code...
+    }
+
+    public function excelFormImport(Request $request)
+    {
+      try {
+
+        Excel::import(new UploadFormImport, $request->file('file'));
+        return response()->json([
+          'status' => 'success',
+          'message' => 'Uploaded successfully',
+        ],200);
+    } catch (\Exception $exception){
+        return response()->json([
+          'status' => 'error',
+          'message' => $exception->getMessage()
+        ],500);
+    }
+
+      # code...
+    }
+    
+  }
+

@@ -2,35 +2,36 @@
 
 namespace App\Http\Controllers\Api;
 
-use Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
-use Notification;
-use App\Notifications\uploadFormNotification;
 
-use App\Traits\ApiResponser;
+use Notification;
 use App\Models\User;
 use App\Models\Category;
-use App\Models\NotifyUpload;
-use App\Models\NotifyApproval;
 use App\Models\UploadForm;
-use App\Models\UploadFormCreator;
-use App\Models\UploadFormSubject;
-use App\Models\UploadFormContributor;
-use App\Models\UploadFormType;
-use App\Models\UploadFormFormat;
-use App\Models\UploadFormIdentifier;
-use App\Models\UploadFormSource;
-use App\Models\UploadFormCoverage;
-use App\Models\UploadFormDivision;
-use App\Models\UploadFormFile;
+use App\Models\NotifyUpload;
+
+use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
-
-
+use App\Models\NotifyApproval;
+use App\Models\UploadFormFile;
+use App\Models\UploadFormType;
 use App\Mail\ApprovalUploadForm;
 use App\Mail\RejectedUploadForm;
 use App\Mail\VerifiedUploadForm;
+use App\Models\UploadFormFormat;
+use App\Models\UploadFormSource;
+use App\Models\UploadFormCreator;
+use App\Models\UploadFormSubject;
+use App\Models\UploadFormCoverage;
+use App\Models\UploadFormDivision;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Models\UploadFormIdentifier;
+
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Models\UploadFormContributor;
+use App\Notifications\uploadFormNotification;
 
 
 class UploadFormController extends Controller
@@ -91,6 +92,7 @@ class UploadFormController extends Controller
       $key->file_name = (count($key->uploadFormFile) != 0) ? $key->uploadFormFile[0]->file_name : null ;
     }
     return $this->success(['form' => $uploadForm]);
+
   }
 
   public function jsonGenerated()
@@ -393,7 +395,7 @@ class UploadFormController extends Controller
         'body' => $fields['title']
       ];
 
-      Mail::to($user->email)->send(new ApprovalUploadForm($details));
+      // Mail::to($user->email)->send(new ApprovalUploadForm($details));
 
       return $this->success(['form_upload' => $uploadForm],"Upload Form Success");
   }

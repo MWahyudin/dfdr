@@ -274,7 +274,10 @@ Route::get('/read-notification-approval/{id}', [NotificationController::class, '
 
 
 Route::post('/pdf/generated/report/', [ReportController::class, 'pdfReportGenerated']);
+Route::post('/excel/import/report/', [ReportController::class, 'excelFormImport']);
 Route::post('/excel/deposit/report/', [ReportController::class, 'excelReportDeposit']);
+// mw get report
+Route::get('/pdf/deposit/{id}/report/', [ReportController::class, 'getPdfReportDeposit']);
 
 
 

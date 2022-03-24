@@ -57,6 +57,7 @@ import UserProfile from "../pages/UserProfile.vue";
 import BulkUser from "../pages/admin/BulkUser.vue";
 import BulkEditor from "../pages/admin/BulkEditor.vue";
 import ReportPdf from "../pages/admin/ReportPdf.vue";
+import ViewJson from "../pages/admin/JsonViewer.vue";
 
 const routes = [{
         path: "",
@@ -349,12 +350,19 @@ const routes = [{
                 component: ReportPdf,
                 name: "ReportPdf",
             },
+           
         ],
     },
     {
         path: "/adm-config",
         component: AdminCreateLayout,
     }
+    ,
+    {
+        path: "/view-json-deposit/:id",
+        component: ViewJson,
+        name: "ViewJson",
+    },
 ];
 
 const router = new VueRouter({
