@@ -168,6 +168,14 @@
                 <div class="row">
                   <div class="col-md-12">
                     <h3>File in this Submission</h3>
+                     <a
+                          :href="
+                            '/public/storage/uploads/files/repository/' + submissions.file
+                          "
+                          target="_blank"
+                        v-show="submissions.file != null"
+                        >{{submissions.file}}</a>
+                   
                     <ul class="list-group">
                       <li
                         class="list-group-item"

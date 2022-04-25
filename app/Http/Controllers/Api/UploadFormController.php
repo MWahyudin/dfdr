@@ -237,7 +237,7 @@ class UploadFormController extends Controller
         'language' => "required",
         'relation' => "required",
         'coverage' => "required",
-        'division_information' => "required",
+        // 'division_information' => "required",
         'file_upload.*' => "required",
         'user_id' => "required",
         'right_management' => "required",
@@ -270,7 +270,7 @@ class UploadFormController extends Controller
       $identifier = json_decode($fields['identifier'], true);
       $source = json_decode($fields['source'], true);
       $coverage = json_decode($fields['coverage'], true);
-      $division = json_decode($fields['division_information'], true);
+      // $division = json_decode($fields['division_information'], true);
       
       // $creator = explode(',', $fields['creator']);
       // // dd($creator);
@@ -331,11 +331,11 @@ class UploadFormController extends Controller
         $upload_form->uploadFormCoverage()->save($upload_form_coverage);
       }
 
-      foreach ($division as $key => $keyDivision) {
-        $upload_form_division = new UploadFormDivision;
-        $upload_form_division->Division = $keyDivision['division_information_name'];
-        $upload_form->uploadFormDivision()->save($upload_form_division);
-      }
+      // foreach ($division as $key => $keyDivision) {
+      //   $upload_form_division = new UploadFormDivision;
+      //   $upload_form_division->Division = $keyDivision['division_information_name'];
+      //   $upload_form->uploadFormDivision()->save($upload_form_division);
+      // }
 
 
       if ($upload_form_file_image = $request->file_upload) {
@@ -343,8 +343,18 @@ class UploadFormController extends Controller
           // dd($value);
           $upload_form_file = new UploadFormFile;
           $upload_form_file->file_size = ($value->getSize() / 1000) .' KB';
+         if ($request->is_private[$key] == 1) {
+          // storage_path('app/private_file/' . $file_name)
+
+          $path = storage_path('app/private_file/');
+          $value->move($path, $value->getClientOriginalName());
+          $upload_form_file->is_private = $request->is_private[$key];
+         }else{
           $path = public_path() . '/storage/uploads/file_upload';
           $value->move($path, $value->getClientOriginalName());
+          $upload_form_file->is_private = $request->is_private[$key];
+
+         }
           $upload_form_file->file =$path.'/'.$value->getClientOriginalName();
           $upload_form_file->file_name = $value->getClientOriginalName();
           $upload_form_file->file_extention = $value->getClientOriginalExtension();
@@ -577,7 +587,7 @@ class UploadFormController extends Controller
     $identifier = explode(',', $request->identifier);
     $source = explode(',', $request->source);
     $coverage = explode(',', $request->coverage);
-    $division = explode(',', $request->division_information);
+    // $division = explode(',', $request->division_information);
 
     $i = 0;
     foreach ($creator as $key) { // 1 (0)
@@ -797,31 +807,31 @@ class UploadFormController extends Controller
     }
 
     $i = 0;
-    foreach ($division as $key) {
-      $getData = UploadFormDivision::where('upload_form_id', '=', $id)->get();
+    // foreach ($division as $key) {
+    //   $getData = UploadFormDivision::where('upload_form_id', '=', $id)->get();
 
-      if ($i <= (count($getData)-1))
-      {
-        $upload_form_division = UploadFormDivision::find($getData[$i]->id);
-        $upload_form_division->Division = $key;
-        $uploadForm->uploadFormDivision()->save($upload_form_division);
+    //   if ($i <= (count($getData)-1))
+    //   {
+    //     $upload_form_division = UploadFormDivision::find($getData[$i]->id);
+    //     $upload_form_division->Division = $key;
+    //     $uploadForm->uploadFormDivision()->save($upload_form_division);
 
-        // loop reached limit & lenght less than get data..
-        if ($i == (count($division)-1) && count($division) < count($getData))
-        {
-          for ($j = $i+1; $j < count($getData); $j++)
-            $upload_form_division = UploadFormDivision::destroy($getData[$j]->id);
-        }
-      }
-      else
-      {
-        $upload_form_division = new UploadFormDivision;
-        $upload_form_division->Division = $key;
-        $uploadForm->uploadFormDivision()->save($upload_form_division);
-      }
+    //     // loop reached limit & lenght less than get data..
+    //     if ($i == (count($division)-1) && count($division) < count($getData))
+    //     {
+    //       for ($j = $i+1; $j < count($getData); $j++)
+    //         $upload_form_division = UploadFormDivision::destroy($getData[$j]->id);
+    //     }
+    //   }
+    //   else
+    //   {
+    //     $upload_form_division = new UploadFormDivision;
+    //     $upload_form_division->Division = $key;
+    //     $uploadForm->uploadFormDivision()->save($upload_form_division);
+    //   }
 
-      $i++;
-    }
+    //   $i++;
+    // }
 
     if ($request->file('upload_card') != "")
     {

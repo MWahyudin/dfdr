@@ -19,6 +19,7 @@ class UploadFormImport implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
+        // dd($row);
         $upload_form = new UploadForm();
 
         $is_exist = $upload_form->find($row['id']);
@@ -33,6 +34,7 @@ class UploadFormImport implements ToModel, WithHeadingRow
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'language' => $this->getLanguage($row['language']),
                 'relation' => $row['relation'],
+                'file' => $row['file'],
                 'right_management' => $row['right_management'],
 
             ]);
@@ -53,6 +55,7 @@ class UploadFormImport implements ToModel, WithHeadingRow
                 'date' => date('Y-m-d', strtotime($row['date'])),
                 'language' => $this->getLanguage($row['language']),
                 'relation' => $row['relation'],
+                'file' => $row['file'],
                 'right_management' => $row['right_management'],
             ]);
 

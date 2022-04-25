@@ -135,7 +135,7 @@
                   variant="secondary"
                   class="btn-sm"
                   v-b-tooltip.hover
-                  title="Open folder"
+                  title="Open folderr"
                   @click="openDir(data.item.file)"
                   ><i class="fas fa-fw fa-folder"></i
                 ></b-button>
@@ -151,7 +151,9 @@
                  <b-table :fields="fieldModals" :items="selectedFiles">
       <template #cell(file)="data">
         <!-- `data.value` is the value after formatted by the Formatter -->
-        <a :href="`${data.value}`" target="_blank">
+     <div v-if="data.value.includes('/storage/uploads/file_upload/')">
+          
+      <a :href="`${data.value}`" target="_blank">
             <b-button
                   variant="success"
                   class="btn-sm"
@@ -161,6 +163,19 @@
                   ><i class="fas fa-fw fa-download"></i
                 ></b-button>
         </a>
+     </div>
+     <div v-else>
+
+         <b-button
+                  variant="success"
+                  class="btn-sm"
+                  v-b-tooltip.hover
+                  title="Download file"
+                 @click="getFileApi(data.value)"
+                  ><i class="fas fa-fw fa-download"></i
+                ></b-button>
+         
+     </div>
       </template>
     </b-table>
 
@@ -218,6 +233,7 @@ import { required, minLength, email } from "vuelidate/lib/validators";
 export default {
   data() {
     return {
+      fileName : null,
        fieldModals: [
           {
             // A column that needs custom formatting,
@@ -242,8 +258,17 @@ export default {
            key: 'file',
             label: 'Aksi',
             formatter: value => {
+              let is_private = value.includes('private_file')
                var filename = value.substring(value.lastIndexOf('/')+1);
-        return "/storage/uploads/file_upload/" + filename;
+        if(is_private === true) {
+          // this.fileName = filename;
+          return filename;
+        }
+           else {
+         return  "/storage/uploads/file_upload/" + filename;
+             
+        // return is_private;
+            }
             }
         },
           // {
@@ -319,9 +344,30 @@ export default {
     },
   },
   methods: {
+    getFileApi(filename) {
+      axios
+        .get("/api/file/" + filename , {
+          responseType: "blob"
+        })
+        .then((response) => {
+          console.log(response.data);
+          //  var headers = response.headers();
+     var blob = new Blob([response.data]);
+     var link = document.createElement('a');
+     link.href = window.URL.createObjectURL(blob);
+     link.download = filename;
+     link.click();
+     link.remove();
+   
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
     openDir(path){
 console.log(path);
-      window.open(path, '_blank');
+      // window.open(path, '_blank');
+       window.open(`public/storage/uploads/files/repository/${path}`, '_blank');
     
     },
     fullName(){
@@ -366,10 +412,10 @@ console.log(path);
     onRegister() {
       this.submitted = true;
       var vm = this;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        return;
-      }
+      // this.$v.$touch();
+      // if (this.$v.$invalid) {
+      //   return;
+      // }
       let formData = new FormData();
       formData.append("file", this.form.fileExcel);
       axios

@@ -58,6 +58,12 @@ import BulkUser from "../pages/admin/BulkUser.vue";
 import BulkEditor from "../pages/admin/BulkEditor.vue";
 import ReportPdf from "../pages/admin/ReportPdf.vue";
 import ViewJson from "../pages/admin/JsonViewer.vue";
+// add by mw
+import TemplateHome from "../pages/admin/template/Home.vue"
+import TemplateSubmission from "../pages/admin/template/Submission.vue"
+import TemplateAbout from "../pages/admin/template/About.vue"
+import TemplateContact from "../pages/admin/template/Contact.vue"
+import TemplateSlider from "../pages/admin/template/Slider.vue"
 
 const routes = [{
         path: "",
@@ -349,6 +355,34 @@ const routes = [{
                 path: "/report-pdf-deposit",
                 component: ReportPdf,
                 name: "ReportPdf",
+            },
+
+            // add by mw
+            // home
+            {
+                path: "/template/home",
+                component: TemplateHome,
+                name: "TemplateHome",
+            },
+            {
+                path: "/template/submission",
+                component: TemplateSubmission,
+                name: "TemplateSubmission",
+            },
+            {
+                path: "/template/about",
+                component: TemplateAbout,
+                name: "TemplateAbout",
+            },
+            {
+                path: "/template/contact",
+                component: TemplateContact,
+                name: "TemplateContact",
+            },
+            {
+                path: "/template/slider",
+                component: TemplateSlider,
+                name: "TemplateSlider",
             },
            
         ],

@@ -7,7 +7,7 @@
             <div class="row ">
               <div class="col-xl-8 col-md-4 col-sm-4 col-12 mx-auto a">
                 <h3 class="text-muted mb-md-0 mb-2 bold-text">
-                  DIGITAL<br><b>REPOSITORY</b>.
+                 <b v-html="title"></b>.
                 </h3>
                 <br>
                 <img
@@ -45,8 +45,8 @@
                 <h6 class="mb-3 mb-lg-4 text-muted bold-text mt-sm-0 mt-5">
                   <b>ADDRESS</b>
                 </h6>
-                <p class="mb-1">605, RATAN ICON BUILDING</p>
-                <p>SEAWOODS SECTOR</p>
+                <p class="mb-1" v-html="address"></p>
+               
               </div>
             </div>
             <div class="row ">
@@ -71,28 +71,24 @@
                   ><span>&#174;</span> Framework Digital Repository All Rights Reserved.</small
                 >
               </div>
-              <div
-                class="col-xl-2 col-md-4 col-sm-4 col-auto order-1 align-self-end "
-              >
-                <h6 class="mt-55 mt-2 text-muted bold-text">
-                  <b>EMAIL 1</b>
-                </h6>
-                <small>
-                  <span><i class="fa fa-envelope" aria-hidden="true"></i></span>
-                  EMAIL1@gmail.com</small
-                >
-              </div>
-              <div
+            
+              <!-- Email -->
+              <!-- <div v-for="(email,i) in emails" :key="i"> -->
+
+              <div v-for="(email,i) in emails" :key="i"
                 class="col-xl-2 col-md-4 col-sm-4 col-auto order-2 align-self-end mt-3 "
               >
-                <h6 class="text-muted bold-text"><b>EMAIL 2</b></h6>
+                <h6 class="text-muted bold-text"><b>EMAIL {{i+1}}</b></h6>
                 <small
                   ><span
                     ><i class="fa fa-envelope" aria-hidden="true"></i
                   ></span>
-                  EMAIL2@gmail.com</small
+                  {{email.content}}</small
                 >
               </div>
+                <!-- End Email -->
+              <!-- </div> -->
+                
             </div>
           </div>
         </div>
@@ -100,7 +96,41 @@
     </div>
   </div>
 </template>
-
+<script>
+export default {
+  name: 'FooterComponent',
+  data() {
+    return {
+      emails: null,
+     address: null,
+     title: null,
+      // description: null
+    };
+  },
+  methods: {
+    getAddress() {
+      axios.get('/api/template/home/5').then(response => {
+        this.address = response.data.data.content;
+      });
+    },
+     getTitle() {
+      axios.get('/api/template/home/1').then(response => {
+        this.title = response.data.data.content;
+      });
+    },
+      getEmails() {
+      axios.get('/api/template/home/4').then(response => {
+        this.emails = response.data.data;
+      });
+    }
+  },
+  created () {
+    this.getAddress();
+    this.getTitle();
+    this.getEmails();
+  },
+}
+</script>
 <style scoped>
 /* @import url("https://fonts.googleapis.com/css?family=Rubik&display=swap"); */
 .container-fluid {

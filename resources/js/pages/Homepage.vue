@@ -14,39 +14,17 @@
         @sliding-start="onSlideStart"
         @sliding-end="onSlideEnd"
       >
-        <!-- Text slides with image -->
-        <b-carousel-slide
-          caption="Digital Repository"
-          text="Nulla vitae elit libero, a pharetra augue mollis interdum."
-          img-src="/banner/1.jpg"
-        ></b-carousel-slide>
+       
 
         <!-- Slides with custom text -->
-        <b-carousel-slide img-src="/banner/2.jpg">
-          <h1>Digital Repository</h1>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
+      <div v-for="(image,i) in images"  :key="i">
+          <b-carousel-slide :img-src="getPath(image.path)">
+         
+          <div v-html="image.content"></div>
         </b-carousel-slide>
+      </div>
 
-        <!-- Slides with image only -->
-        <b-carousel-slide img-src="/banner/3.jpg"></b-carousel-slide>
-
-        <!-- Slides with img slot -->
-        <!-- Note the classes .d-block and .img-fluid to prevent browser default image alignment -->
-        <b-carousel-slide>
-          <template #img>
-            <img
-              class="d-block img-fluid w-100"
-              width="1024"
-              height="300"
-              src="/banner/4.jpg"
-              alt="image slot"
-            >
-          </template>
-        </b-carousel-slide>
-
-        <b-carousel-slide img-src="/banner/6.jpg"></b-carousel-slide>
+     
       </b-carousel>
     </div>
 
@@ -249,13 +227,9 @@
         <div class="col-md-3 mt-2">
           <div class="card p-1">
             <div class="card-body">
-              <h4 class="text-center">What Is <b>Digital Repository?</b></h4>
-              <p class="text-justify mt-2">
-                &nbsp;&nbsp;&nbsp;&nbsp;<b>Digital Repository</b> is Lorem ipsum
-                dolor sit amet consectetur adipisicing elit. Ipsum deserunt
-                quibusdam vel, ullam, error, aperiam voluptate nobis voluptatem
-                cum consectetur quisquam aut? Praesentium facere molestiae
-                aperiam repellendus distinctio vero amet.
+              <h4 class="text-center">What Is <b v-html="title">?</b></h4>
+              <p class="text-justify mt-2" v-html="description">
+                &nbsp;&nbsp;&nbsp;&nbsp;<b v-html="title"></b>
               </p>
             </div>
           </div>
@@ -321,7 +295,10 @@
 export default {
   data() {
     return {
+      images : [],
       news: [],
+      title: null,
+      description: null,
       loading: false,
       slide: 0,
       sliding: null,
@@ -338,15 +315,17 @@ export default {
     creators() {
       return this.$store.getters.getAllCreator;
     },
+  
   },
   mounted() {
     this.$store.dispatch("getCreator");
-
+    this.getImages()
     this.preUsed();
     this.preAdmin();
     // this.$store.dispatch("getCategory");
     this.getNews();
-    
+    this.getDescription();
+    this.getHeader();
     
 
     // console.log(this.creators);
@@ -354,11 +333,36 @@ export default {
     // console.log("homepage");
   },
   methods: {
+      getPath(link){
+       var filename = link.substring(link.lastIndexOf('/')+1);
+        let file_path = "/storage/uploads/file_upload/" + filename;
+        return file_path;
+    },
+    getImages() {
+      axios
+        .get("/api/template/images")
+        .then((response) => {
+          this.images = response.data.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     onSlideStart(slide) {
       this.sliding = true
     },
     onSlideEnd(slide) {
       this.sliding = false
+    },
+       getDescription() {
+      axios.get('/api/template/home/2').then(response => {
+        this.description = response.data.data.content;
+      });
+    },
+     getHeader() {
+      axios.get('/api/template/home/1').then(response => {
+        this.title = response.data.data.content;
+      });
     },
 
     preUsed() {

@@ -628,7 +628,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-md-6">
+                  <!-- <div class="col-md-6">
                     <div class="form-group">
                       <div
                         class="row"
@@ -694,7 +694,7 @@
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </div>
 
                 <!-- File upload -->
@@ -710,7 +710,7 @@
                         <div class="form-group">
                           <div class="row">
                             <div class="col-md-8">
-                              <label for="upload_file">File {{ i + 1 }}</label>
+                              <label for="upload_file">File{{ i + 1 }}</label>
                               <input
                                 type="file"
                                 ref="documentFile"
@@ -732,6 +732,8 @@
                             </div>
                             <div class="col-md-4">
                               <div class="form-group mt-4">
+                                 <b-form-checkbox v-model="form.is_private[i]" name="check-button" switch>
+    </b-form-checkbox>
                                 <b-button
                                   v-if="form.file_upload.length > 1"
                                   v-b-modal.modal-1
@@ -803,6 +805,7 @@ export default {
       content: "",
       // files: [],
       form: {
+        is_private: [],
         title: "",
         category: "",
         description: "",
@@ -832,7 +835,7 @@ export default {
         identifier: [{ identifier_name: "" }],
         source: [{ source_name: "" }],
         coverage: [{ coverage_name: "" }],
-        division_information: [{ division_information_name: "" }],
+        // division_information: [{ division_information_name: "" }],
         file_upload: [{}],
       },
       userdata: JSON.parse(localStorage.getItem("user")),
@@ -889,11 +892,11 @@ export default {
           coverage_name: { required },
         },
       },
-      division_information: {
-        $each: {
-          division_information_name: { required },
-        },
-      },
+      // division_information: {
+      //   $each: {
+      //     division_information_name: { required },
+      //   },
+      // },
     },
   },
   computed: {
@@ -987,7 +990,7 @@ export default {
       this.form.identifier = "";
       this.form.source = "";
       this.form.coverage = "";
-      this.form.division_information = "";
+      // this.form.division_information = "";
       this.form.file_upload = [];
       this.$refs.file.value = null;
     },
@@ -1112,12 +1115,14 @@ export default {
       formData.append("language", this.form.language);
       formData.append("relation", this.form.relation);
       formData.append("coverage", JSON.stringify(this.form.coverage));
-      formData.append(
-        "division_information",
-        JSON.stringify(this.form.division_information)
-      );
+      // formData.append(
+      //   "division_information",
+      //   JSON.stringify(this.form.division_information)
+      // );
       for (const i of Object.keys(this.form.file_upload)) {
+        let is_private = this.form.is_private[i] == undefined ? 0 : 1;
         formData.append(`file_upload[${i}]`, this.form.file_upload[i]);
+        formData.append(`is_private[${i}]`, is_private);
       }
       //         // <!-- WE APPEND THE AVATAR TO THE FORMDATA WE'RE GONNA POST -->
       //         for (var i = 0; i < this.form.file_upload.length; i++) {

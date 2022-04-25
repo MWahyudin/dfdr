@@ -30,7 +30,7 @@
         <th>Identifier</th>
         <th>Source</th>
         <th>Coverage</th>
-        <th>Division Information</th>
+        <!-- <th>Division Information</th> -->
         <th>File</th>
 
 			</tr>
@@ -55,7 +55,7 @@
         <td>{{$datas->identifier }}</td>
         <td>{{$datas->source }}</td>
         <td>{{$datas->coverage }}</td>
-        <td>{{$datas->division }}</td>
+        <!-- <td>{{$datas->division }}</td> -->
         <td>{{$datas->file}}</td>
           
      

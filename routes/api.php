@@ -20,9 +20,15 @@ use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\NotificationController;
 
 use App\Http\Controllers\Auth\AuthController;
-
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\PreUseController;
-
+use App\Http\Controllers\Template\AboutUsController;
+use App\Http\Controllers\Template\ContactController;
+use App\Http\Controllers\Template\ContentGuidelaneController;
+use App\Http\Controllers\Template\HomeController;
+use App\Http\Controllers\Template\HowSubmitController;
+use App\Http\Controllers\Template\LicenseController;
+use App\Models\Template\License;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +53,8 @@ use Illuminate\Support\Facades\Route;
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
+
+ 
 
   Route::get('/user/export-user-excel', [UserController::class, 'export']);
   Route::get('/user/export-editor-excel', [UserController::class, 'exportEditor']);
@@ -275,9 +283,37 @@ Route::get('/read-notification-approval/{id}', [NotificationController::class, '
 
 Route::post('/pdf/generated/report/', [ReportController::class, 'pdfReportGenerated']);
 Route::post('/excel/import/report/', [ReportController::class, 'excelFormImport']);
+Route::post('/excel/import/subject', [ReportController::class, 'importSubject']);
+Route::get('/excel/export/subject', [ReportController::class, 'exportSubject']);
 Route::post('/excel/deposit/report/', [ReportController::class, 'excelReportDeposit']);
 // mw get report
 Route::get('/pdf/deposit/{id}/report/', [ReportController::class, 'getPdfReportDeposit']);
+ // get file
+ Route::get('/file/{file_name}', [FileController::class, 'getFile']);
+
+
+ // Admin template
+
+ Route::prefix('template')->group(function () {
+     
+    route::apiResource('/about-us', AboutUsController::class);
+    route::apiResource('/contact', ContactController::class);
+    route::apiResource('/content-guidelane', ContentGuidelaneController::class);
+    route::apiResource('/home', HomeController::class);
+    route::get('submission', [HomeController::class, 'getSubmissionDescription']);
+    route::put('submission/{id}', [HomeController::class, 'updateSubmissionDescription']);
+    route::get('images', [HomeController::class, 'getImages']);
+    route::post('images', [HomeController::class, 'storeImages']);
+    route::post('image/update', [HomeController::class, 'updateImages']);
+    route::get('image/{id}', [HomeController::class, 'showImages']);
+    route::delete('image/{id}', [HomeController::class, 'deleteImage']);
+
+    route::apiResource('/license', LicenseController::class);
+    route::get('user-guide', [LicenseController::class, 'getUserGuide']);
+    route::put('user-guide/{id}', [LicenseController::class, 'updateUserGuide']);
+    route::apiResource('/how-submit', HowSubmitController::class);
+ });
+
 
 
 

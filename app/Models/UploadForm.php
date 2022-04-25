@@ -22,6 +22,7 @@ class UploadForm extends Model
       'status',
       'upload_for',
       'total_download',
+      'file',
     ];
 
     public function users()
